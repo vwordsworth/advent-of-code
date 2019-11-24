@@ -4,9 +4,10 @@ from node import Node
 
 def main():
     data = read_input()
-    license_sum = get_license_sum(data)
+    license_sum, root = get_license_sum(data)
     print("Part 1:\n\tTraversal license sum: {0}".format(str(license_sum)))
-
+    root_value = find_value_of_root(root)
+    print("Part 2:\n\tValue of root node: {0}".format(str(root_value)))
 
 def get_license_sum(data):
     license_sum = 0
@@ -21,8 +22,8 @@ def get_license_sum(data):
 
         if not current_parent.has_processed_all_children():
             child = Node(data[i], data[i+1])
-            current_parent.increment_processed_children()
-            
+            current_parent.add_child(child)
+
             if child.has_children():        
                 stack.append(current_parent)
                 current_parent = child
@@ -37,7 +38,22 @@ def get_license_sum(data):
         
         i = next_location
 
-    return license_sum
+    return license_sum, root
+
+
+def find_value_of_root(root):
+    value = 0
+    if not root.has_children():
+        value = root.get_metadata_sum()
+    else:
+        children = root.get_children()
+        for metadata in root.get_metadata():
+            if metadata > 0:
+                try:
+                    value += find_value_of_root(children[metadata-1])
+                except IndexError:
+                    pass
+    return value
 
 
 def process_metadata_and_return_sum_and_next_index(node, start, data):

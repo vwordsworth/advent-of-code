@@ -4,6 +4,7 @@ class Node:
     def __init__(self, child_count, metadata_count):
         self.child_count = int(child_count)
         self.children_processed = 0
+        self.children = []
         self.metadata_count = int(metadata_count)
         self.metadata_processed = 0
         self.metadata = []
@@ -26,11 +27,18 @@ class Node:
 
     def get_metadata_sum(self):
         return self.metadata_sum
-    
+
     def add_metadata(self, metadata):
         self.metadata.append(int(metadata))
         self.metadata_sum += int(metadata)
         self.metadata_processed += 1
+
+    def get_children(self):
+        return self.children
+
+    def add_child(self, child):
+        self.children.append(child)
+        self.children_processed += 1
 
     def increment_processed_children(self):
         self.children_processed += 1
