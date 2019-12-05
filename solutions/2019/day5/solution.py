@@ -1,4 +1,3 @@
-from copy import deepcopy
 from instructions.instruction_factory import InstructionFactory, HltEncounteredException
 
 
@@ -17,7 +16,6 @@ def run_program(program):
             break
         instruction.set_result()
         instruction_ptr = instruction.get_next_instruction_pointer()
-    return program[0]
 
 
 def _read_input():
