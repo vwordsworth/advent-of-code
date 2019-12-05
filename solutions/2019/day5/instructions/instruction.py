@@ -13,12 +13,7 @@ class Instruction(metaclass=ABCMeta):
         self.params = params
     
     def get_next_instruction_pointer(self):
-        value = None
-        if self.override_pointer:
-            value = self.override_pointer
-        else:
-            value = self.pointer + self.size
-        return value
+        return self.override_pointer if self.override_pointer else self.pointer + self.size
 
     def get_nth_parameter_value(self, n):
         return (self.params // pow(10,n)) % 10
