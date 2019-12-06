@@ -45,23 +45,5 @@ class Node:
     def __str__(self):
         return self.name
 
-    def __lt__(self, other):
-        return self.name < other.name
-
-    def __gt__(self, other):
-        return self.name > other.name
-
-    def __le__(self, other):
-        return self.name <= other.name
-
-    def __ge__(self, other):
-        return self.name >= other.name
-
-    # def __eq__(self, other):
-    #     return (self.name, self.children, self.parents) == (other.name, other.children, other.parents)
-
-    def __ne__(self, other):
-        return not(self == other)
-
     def __hash__(self):
         return hash((self.name))

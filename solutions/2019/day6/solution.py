@@ -1,6 +1,7 @@
 from node import Node
 from sys import maxsize
 
+
 def main():
     data = _read_input()
     nodes = generate_graph(data)
