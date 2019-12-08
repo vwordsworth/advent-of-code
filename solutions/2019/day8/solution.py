@@ -1,6 +1,6 @@
 from collections import Counter
 from sys import maxsize
-from matplotlib.pyplot import imshow, show, subplots
+from matplotlib.pyplot import savefig, subplots
 from matplotlib.cm import Greys
 
 WIDTH = 25
@@ -45,7 +45,7 @@ def get_color_for_position(position, image, number_layers, layer_size):
 def generate_plot(array):
     fig, ax = subplots()
     imgplot = ax.imshow(array, cmap=Greys)
-    show()
+    savefig('message.png')
 
 
 def _read_input():
