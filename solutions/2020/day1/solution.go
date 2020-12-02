@@ -22,6 +22,9 @@ func getInput() []int {
 	return lines
 }
 
+/*
+* Initial submission
+ */
 func simpleTwoProduct(nums []int) int {
 	for i, num1 := range nums {
 		for _, num2 := range nums[i+1:] {
@@ -29,19 +32,6 @@ func simpleTwoProduct(nums []int) int {
 				return num1 * num2
 			}
 		}
-	}
-	return -1
-}
-
-func refactorTwoProduct(nums []int, goal int) int {
-	set := make(map[int]bool)
-
-	for _, num := range nums {
-		need := goal - num
-		if _, seen := set[need]; seen {
-			return need * num
-		}
-		set[num] = true
 	}
 	return -1
 }
@@ -55,6 +45,22 @@ func simpleThreeProduct(nums []int) int {
 				}
 			}
 		}
+	}
+	return -1
+}
+
+/*
+* Refactor
+ */
+func refactorTwoProduct(nums []int, goal int) int {
+	set := make(map[int]bool)
+
+	for _, num := range nums {
+		need := goal - num
+		if _, seen := set[need]; seen {
+			return need * num
+		}
+		set[num] = true
 	}
 	return -1
 }
