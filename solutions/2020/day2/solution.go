@@ -22,6 +22,9 @@ func getInput() []string {
 	return lines
 }
 
+/*
+* Initial submission
+ */
 func parseLine(line string) (int, int, byte, string) {
 	words := strings.Fields(line)
 
@@ -52,6 +55,37 @@ func isPasswordPositionValid(password string, letter byte, pos1 int, pos2 int) b
 	return (password[pos1-1] == letter) != (password[pos2-1] == letter)
 }
 
+/*
+* Refactor
+ */
+type entry struct {
+	value      string
+	letter     byte
+	int1, int2 int
+}
+
+func newEntry(line string) *entry {
+	words := strings.Fields(line)
+	bounds := strings.Split(words[0], "-")
+
+	pwdEntry := entry{}
+	pwdEntry.int1, _ = strconv.Atoi(bounds[0])
+	pwdEntry.int2, _ = strconv.Atoi(bounds[1])
+	pwdEntry.letter = words[1][0]
+	pwdEntry.value = words[2]
+
+	return &pwdEntry
+}
+
+func refactorIsPasswordCountValid(line *entry) bool {
+	count := strings.Count(line.value, string(line.letter))
+	return count >= line.int1 && count <= line.int2
+}
+
+func refactorIsPositionValid(line *entry) bool {
+	return (line.value[line.int1-1] == line.letter) != (line.value[line.int2-1] == line.letter)
+}
+
 func main() {
 	start := time.Now()
 	passwords := getInput()
@@ -60,13 +94,13 @@ func main() {
 	validPositionPasswords := 0
 
 	for _, line := range passwords {
-		int1, int2, letter, pwd := parseLine(line)
+		pwdEntry := newEntry(line)
 
-		if isPasswordCountValid(pwd, letter, int1, int2) {
+		if refactorIsPasswordCountValid(pwdEntry) {
 			validCountPasswords++
 		}
 
-		if isPasswordPositionValid(pwd, letter, int1, int2) {
+		if refactorIsPositionValid(pwdEntry) {
 			validPositionPasswords++
 		}
 	}

@@ -22,6 +22,9 @@ func getInput() []int {
 	return lines
 }
 
+/*
+* Initial submission
+ */
 func simpleTwoProduct(nums []int) int {
 	for i, num1 := range nums {
 		for _, num2 := range nums[i+1:] {
@@ -46,16 +49,42 @@ func simpleThreeProduct(nums []int) int {
 	return -1
 }
 
+/*
+* Refactor
+ */
+func refactorTwoProduct(nums []int, goal int) int {
+	set := make(map[int]bool)
+
+	for _, num := range nums {
+		need := goal - num
+		if _, seen := set[need]; seen {
+			return need * num
+		}
+		set[num] = true
+	}
+	return -1
+}
+
+func refactorThreeProduct(nums []int, goal int) int {
+	for i, num := range nums {
+		need := goal - num
+		if result := refactorTwoProduct(nums[:i], need); result > -1 {
+			return result * num
+		}
+	}
+	return -1
+}
+
 func main() {
 	start := time.Now()
+
 	numbers := getInput()
 
-	twoProduct := simpleTwoProduct(numbers)
+	twoProduct := refactorTwoProduct(numbers, 2020)
 	fmt.Println("Two product:\t", twoProduct)
 
-	threeProduct := simpleThreeProduct(numbers)
+	threeProduct := refactorThreeProduct(numbers, 2020)
 	fmt.Println("Three product:\t", threeProduct)
 
-	elapsed := time.Now().Sub(start)
-	fmt.Println("\nTime elapsed:\t", elapsed)
+	fmt.Println("\nTime elapsed:\t", time.Now().Sub(start))
 }
