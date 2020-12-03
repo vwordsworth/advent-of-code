@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"time"
 )
 
 func getInput() []int {
@@ -18,7 +17,6 @@ func getInput() []int {
 		line, _ := strconv.Atoi(scanner.Text())
 		lines = append(lines, line)
 	}
-
 	return lines
 }
 
@@ -76,8 +74,6 @@ func refactorThreeProduct(nums []int, goal int) int {
 }
 
 func main() {
-	start := time.Now()
-
 	numbers := getInput()
 
 	twoProduct := refactorTwoProduct(numbers, 2020)
@@ -85,6 +81,4 @@ func main() {
 
 	threeProduct := refactorThreeProduct(numbers, 2020)
 	fmt.Println("Three product:\t", threeProduct)
-
-	fmt.Println("\nTime elapsed:\t", time.Now().Sub(start))
 }

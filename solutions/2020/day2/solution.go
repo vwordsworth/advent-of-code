@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 )
 
 func getInput() []string {
@@ -18,7 +17,6 @@ func getInput() []string {
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
-
 	return lines
 }
 
@@ -87,7 +85,6 @@ func refactorIsPositionValid(line *entry) bool {
 }
 
 func main() {
-	start := time.Now()
 	passwords := getInput()
 
 	validCountPasswords := 0
@@ -107,5 +104,4 @@ func main() {
 
 	fmt.Println("Valid count passwords:\t", validCountPasswords)
 	fmt.Println("Valid position passwords:\t", validPositionPasswords)
-	fmt.Println("\nTime elapsed:\t", time.Now().Sub(start))
 }

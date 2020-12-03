@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"time"
 )
 
 func getInput() []string {
@@ -16,14 +15,10 @@ func getInput() []string {
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
-
 	return lines
 }
 
 func main() {
-	start := time.Now()
-
 	input := getInput()
-
-	fmt.Println("\nTime elapsed:\t", time.Now().Sub(start))
+	fmt.Println(input)
 }
