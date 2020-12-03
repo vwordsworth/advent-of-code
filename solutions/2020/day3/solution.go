@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 )
 
 func getInput() [][]string {
@@ -17,14 +16,13 @@ func getInput() [][]string {
 	for scanner.Scan() {
 		lines = append(lines, strings.Split(scanner.Text(), ""))
 	}
-
 	return lines
 }
 
 func countTreesOnSlope(input [][]string, dx int, dy int) int {
 	numRows := len(input)
 	widthPattern := len(input[0])
-	count :=0
+	count := 0
 
 	for y := 0; y < numRows; y += dy {
 		x := ((dx*y)/dy) % widthPattern
@@ -32,13 +30,10 @@ func countTreesOnSlope(input [][]string, dx int, dy int) int {
 			count++
 		}
 	}
-
 	return count
 }
 
-
 func main() {
-	start := time.Now()
 	input := getInput()
 
 	numTrees := countTreesOnSlope(input, 3, 1)
@@ -48,7 +43,5 @@ func main() {
 	for _, slope := range slopes {
 		numTrees *= countTreesOnSlope(input, slope[0], slope[1])
 	}
-
 	fmt.Println("Tree count product for all slopes:\t", numTrees)
-	fmt.Println("\nTime elapsed:\t", time.Now().Sub(start))
 }
