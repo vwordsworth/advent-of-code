@@ -1,0 +1,9 @@
+#!/bin/sh
+
+DIRECTORY="day$1"
+
+git checkout -b "2020-day-$1"
+mkdir "$DIRECTORY"
+touch "$DIRECTORY/input.txt"
+cp solution-template.go "$DIRECTORY/solution.go"
+cd $DIRECTORY
