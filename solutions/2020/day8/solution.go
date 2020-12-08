@@ -9,22 +9,33 @@ import (
 	"strings"
 )
 
-func getInput() []string {
+type instruction struct {
+	opCode, modifiedOpCode string
+	offset int
+}
+
+type program struct {
+	instructions []*instruction
+	seenInstr map[int]bool
+	accum, instrPtr int
+}
+
+func getInput() []*instruction {
 	file, _ := os.Open("input.txt")
 	defer file.Close()
 
-	var lines []string
+	var lines []*instruction
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
+		lines = append(lines, newInstruction(scanner.Text()))
 	}
 	return lines
 }
 
-func parseLine(line string) (string, int) {
-	instr := strings.Fields(line)
-	op := instr[0]
-	arg := instr[1]
+func newInstruction(line string) *instruction {
+	parts := strings.Fields(line)
+	opCode := parts[0]
+	arg := parts[1]
 
 	var offset int
 	if string(arg[0]) == "+" {
@@ -34,88 +45,79 @@ func parseLine(line string) (string, int) {
 		offset *= -1
 	}
 
-	return op, offset
+	i := instruction{}
+	i.opCode = opCode
+	i.offset = offset
+	return &i
 }
 
-func q1(input []string) int {
-	accum := 0
-	instrPtr := 0
-
-	var instructionLines []bool
-	for i:=0; i<len(input); i++ {
-		instructionLines = append(instructionLines, false)
-	}
-
-	for !instructionLines[instrPtr] {
-		op, offset := parseLine(input[instrPtr])
-
-		instructionLines[instrPtr] = true
-
-		if op == "nop" {
-			instrPtr++
-		} else if op == "jmp" {
-			instrPtr += offset
-		} else if op == "acc" {
-			accum += offset
-			instrPtr++
-		}
-	}
-
-	return accum
+func newProgram(instructions []*instruction) *program{
+	p := program{}
+	p.accum = 0
+	p.instrPtr = 0
+	p.instructions = instructions
+	p.seenInstr = make(map[int]bool)
+	return &p
 }
 
-func q2(input []string) int {
+func (p *program) runInstruction() {
+	instr := p.instructions[p.instrPtr]
+	opCode := instr.opCode
+	if modifiedOp := instr.modifiedOpCode; len(modifiedOp) > 0 {
+		opCode = modifiedOp
+	}
+
+	p.seenInstr[p.instrPtr] = true
+
+	if opCode == "nop" {
+		p.instrPtr++
+	} else if opCode == "jmp" {
+		p.instrPtr += instr.offset
+	} else if opCode == "acc" {
+		p.accum += instr.offset
+		p.instrPtr++
+	}
+}
+
+func getAccumAtRepeat(input []*instruction) int {
+	program := newProgram(input)
+	for !program.seenInstr[program.instrPtr] {
+		program.runInstruction()
+	}
+	return program.accum
+}
+
+func getTerminatingAccum(input []*instruction) int {
 	modIndex := 0
 
 	for modIndex < len(input) {
-		var temp = make([]string, len(input))
-		copy(temp, input)
-
-		if strings.Contains(temp[modIndex], "nop") {
-			temp[modIndex] = strings.Replace(temp[modIndex],"nop","jmp",1)
-		} else if strings.Contains(temp[modIndex], "jmp") {
-			temp[modIndex] = strings.Replace(temp[modIndex],"jmp","nop",1)
+		if input[modIndex].opCode == "nop" {
+			input[modIndex].modifiedOpCode = "jmp"
+		} else if input[modIndex].opCode == "jmp" {
+			input[modIndex].modifiedOpCode = "nop"
 		}
 
-		modIndex++
-
-		if accum := runCheckTerminates(temp); accum != math.MaxInt32 {
+		if accum := getAccumIfTerminates(input); accum != math.MaxInt32 {
 			return accum
 		}
+
+		input[modIndex].modifiedOpCode = ""
+		modIndex++
 	}
 
 	return math.MaxInt32
 }
 
-func runCheckTerminates(input []string) int {
+func getAccumIfTerminates(input []*instruction) int {
 	desiredPtr := len(input)
+	program := newProgram(input)
 
-	accum := 0
-	instrPtr := 0
-
-	var instructionLines []bool
-	for i:=0; i<len(input); i++ {
-		instructionLines = append(instructionLines, false)
+	for program.instrPtr != desiredPtr && !program.seenInstr[program.instrPtr] {
+		program.runInstruction()
 	}
 
-	for instrPtr != desiredPtr && !instructionLines[instrPtr] {
-		op, offset := parseLine(input[instrPtr])
-
-		instructionLines[instrPtr] = true
-
-		if op == "nop" {
-			instrPtr++
-		} else if op == "jmp" {
-			instrPtr += offset
-		} else if op == "acc" {
-			accum += offset
-			instrPtr++
-		}
-
-	}
-
-	if instrPtr == desiredPtr {
-		return accum
+	if program.instrPtr == desiredPtr {
+		return program.accum
 	}
 
 	return math.MaxInt32
@@ -123,8 +125,6 @@ func runCheckTerminates(input []string) int {
 
 func main() {
 	input := getInput()
-
-	fmt.Println(q1(input))
-
-	fmt.Println(q2(input))
+	fmt.Println("Accumulator at repeat:\t", getAccumAtRepeat(input))
+	fmt.Println("Accumulator at end:\t", getTerminatingAccum(input))
 }
