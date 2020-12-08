@@ -34,21 +34,22 @@ func getInput() []*instruction {
 
 func newInstruction(line string) *instruction {
 	parts := strings.Fields(line)
-	opCode := parts[0]
-	arg := parts[1]
-
-	var offset int
-	if string(arg[0]) == "+" {
-		offset, _ = strconv.Atoi(strings.Split(arg, "+")[1])
-	} else {
-		offset, _ = strconv.Atoi(strings.Split(arg, "-")[1])
-		offset *= -1
-	}
-
 	i := instruction{}
-	i.opCode = opCode
-	i.offset = offset
+	i.opCode = parts[0]
+	i.offset, _ = strconv.Atoi(parts[1])
 	return &i
+}
+
+func (i *instruction) modifyOp() {
+	if i.opCode == "nop" {
+		i.modifiedOpCode = "jmp"
+	} else if i.opCode == "jmp" {
+		i.modifiedOpCode = "nop"
+	}
+}
+
+func (i *instruction) resetOp() {
+	i.modifiedOpCode = ""
 }
 
 func newProgram(instructions []*instruction) *program{
@@ -58,6 +59,19 @@ func newProgram(instructions []*instruction) *program{
 	p.instructions = instructions
 	p.seenInstr = make(map[int]bool)
 	return &p
+}
+
+func (p *program) runProgramUntilRepeat() {
+	for !p.seenInstr[p.instrPtr] {
+		p.runInstruction()
+	}
+}
+
+func (p *program) doesProgramTerminate() bool {
+	for p.instrPtr != len(p.instructions) && !p.seenInstr[p.instrPtr] {
+		p.runInstruction()
+	}
+	return p.instrPtr == len(p.instructions)
 }
 
 func (p *program) runInstruction() {
@@ -81,45 +95,23 @@ func (p *program) runInstruction() {
 
 func getAccumAtRepeat(input []*instruction) int {
 	program := newProgram(input)
-	for !program.seenInstr[program.instrPtr] {
-		program.runInstruction()
-	}
+	program.runProgramUntilRepeat()
 	return program.accum
 }
 
 func getTerminatingAccum(input []*instruction) int {
 	modIndex := 0
-
 	for modIndex < len(input) {
-		if input[modIndex].opCode == "nop" {
-			input[modIndex].modifiedOpCode = "jmp"
-		} else if input[modIndex].opCode == "jmp" {
-			input[modIndex].modifiedOpCode = "nop"
+		input[modIndex].modifyOp()
+
+		program := newProgram(input)
+		if program.doesProgramTerminate() {
+			return program.accum
 		}
 
-		if accum := getAccumIfTerminates(input); accum != math.MaxInt32 {
-			return accum
-		}
-
-		input[modIndex].modifiedOpCode = ""
+		input[modIndex].resetOp()
 		modIndex++
 	}
-
-	return math.MaxInt32
-}
-
-func getAccumIfTerminates(input []*instruction) int {
-	desiredPtr := len(input)
-	program := newProgram(input)
-
-	for program.instrPtr != desiredPtr && !program.seenInstr[program.instrPtr] {
-		program.runInstruction()
-	}
-
-	if program.instrPtr == desiredPtr {
-		return program.accum
-	}
-
 	return math.MaxInt32
 }
 
