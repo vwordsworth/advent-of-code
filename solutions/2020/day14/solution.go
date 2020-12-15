@@ -15,15 +15,13 @@ type program struct {
 }
 
 type mask struct {
-	line string
 	toOne, toZero, toFloat int64
 	floatLocs []int64
 }
 
 type instruction struct {
 	bitmask *mask
-	address int64
-	value int64
+	address, value int64
 }
 
 func newProgram(instr []string) *program {
@@ -67,11 +65,11 @@ func newInstruction(line string, bitMask *mask) *instruction {
 func newMask(line string) *mask {
 	m := mask{}
 	maskRegEx := regexp.MustCompile(`mask = (?P<value>[\dX]+)`)
-	m.line = maskRegEx.FindAllStringSubmatch(line, 1)[0][1]
+	pattern := maskRegEx.FindAllStringSubmatch(line, 1)[0][1]
 	toOne := ""
 	toZero := ""
 	toFloat := ""
-	for i, dig := range m.line {
+	for i, dig := range pattern {
 		switch string(dig) {
 		case "1":
 			toOne += "1"
@@ -85,7 +83,7 @@ func newMask(line string) *mask {
 			toOne += "0"
 			toZero += "1"
 			toFloat += "0"
-			m.floatLocs = append(m.floatLocs, (1 << (len(m.line)-1-i)))
+			m.floatLocs = append(m.floatLocs, (1 << (len(pattern)-1-i)))
 		}
 	}
 	m.toOne, _ = strconv.ParseInt(toOne, 2, 64)
